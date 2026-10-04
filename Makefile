@@ -9,7 +9,7 @@ setup:
 	$(PIP) install --upgrade pip
 	if exist requirements.txt $(PIP) install -r requirements.txt
 
-run: setup 
+run: 
 	$(VENV)/Scripts/streamlit.exe run streamlit_chatbot.py
 
 clean:
