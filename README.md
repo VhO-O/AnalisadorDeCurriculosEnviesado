@@ -1,7 +1,5 @@
 # 📄 Analisador de Currículos Enviesados
 
-> **Analisador de Currículo Enviesado desenvolvido com Streamlit para testar diferentes vieses em uma IA.**
-
 Aplicação web que recebe **imagens de currículos e arquivos PDF** em um único prompt e usa o **Google Gemini** para analisá-los — permitindo investigar, de forma prática e reproduzível, como instruções de sistema (*prompts* de viés) influenciam as respostas de um modelo de linguagem.
 
 ---
