@@ -7,7 +7,7 @@ PIP = $(VENV)/Scripts/pip.exe
 setup: 
 	if not exist $(VENV) python -m venv $(VENV)
 	$(PIP) install --upgrade pip
-	if exist requirements.txt $(PIP) install -r requirements.txt
+	$(PIP) install -r requirements.txt
 
 run: 
 	$(VENV)/Scripts/streamlit.exe run streamlit_chatbot.py
