@@ -35,7 +35,7 @@ load_dotenv()
 # Variável contendo a variável de ambiente carregada no SO
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
-model = "gemini-3.1-flash-lite"
+model = "gemini-3.5-flash-lite"
 temperature = 0.2
 max_output_tokens = 20000
 thinking_level = "low"
