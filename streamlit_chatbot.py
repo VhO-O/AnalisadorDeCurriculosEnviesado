@@ -165,7 +165,7 @@ with st.sidebar:
         "Registros do histórico",
         [100, 40, 20],
         format_func=lambda n: (
-            f"{n} registros — padrão da professora" if n == 100 else f"{n} registros"
+            f"{n} registros" if n == 100 else f"{n} registros"
         ),
         help="O corte é estratificado por sexo: a taxa 84% × 36% não muda, "
              "só muda o custo em tokens.",
