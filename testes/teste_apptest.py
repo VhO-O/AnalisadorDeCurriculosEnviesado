@@ -35,7 +35,7 @@ pdf_name = os.path.basename(PDF)
 _orig_widget_state = ChatInput._widget_state  # property
 
 
-def _widget_state_com_arquivo(self):
+def _widget_state_with_file(self):
     ws = _orig_widget_state.fget(self)
     if self._value is not None:  # só quando há submissão
         info = ws.chat_input_value.file_uploader_state.uploaded_file_info.add()
@@ -46,7 +46,7 @@ def _widget_state_com_arquivo(self):
     return ws
 
 
-ChatInput._widget_state = property(_widget_state_com_arquivo)
+ChatInput._widget_state = property(_widget_state_with_file)
 
 # ---------------------------------------------------------------------------
 # Patch 2: o AppTest só registra arquivos de st.file_uploader. Registramos o
@@ -55,7 +55,7 @@ ChatInput._widget_state = property(_widget_state_com_arquivo)
 _orig_register = AppTest._register_uploaded_files
 
 
-def _register_tambem_chat_input(self, script_runner):
+def _register_also_chat_input(self, script_runner):
     _orig_register(self, script_runner)
     script_runner.register_file(
         UploadedFileRec(
@@ -67,14 +67,14 @@ def _register_tambem_chat_input(self, script_runner):
     )
 
 
-AppTest._register_uploaded_files = _register_tambem_chat_input
+AppTest._register_uploaded_files = _register_also_chat_input
 
 
 # ---------------------------------------------------------------------------
-def diagnosticar(at, rotulo):
+def report(at, label):
     """Imprime o resultado de um run do AppTest."""
     print(f"\n{'=' * 66}")
-    print(f"  {rotulo}")
+    print(f"  {label}")
     print("=" * 66)
 
     if at.exception:
@@ -83,24 +83,24 @@ def diagnosticar(at, rotulo):
             print(f"    {exc.value}")
         return False
 
-    erros = [e.value for e in at.error]
-    if erros:
+    errors = [e.value for e in at.error]
+    if errors:
         print("  st.error capturado:")
-        for e in erros:
-            print(f"    {str(e)[:400]}")
+        for error in errors:
+            print(f"    {str(error)[:400]}")
         return False
 
-    md = [m.value for m in at.markdown]
-    print(f"  markdowns renderizados: {len(md)}")
+    markdowns = [m.value for m in at.markdown]
+    print(f"  markdowns renderizados: {len(markdowns)}")
     print(f"  messages no session_state: {len(at.session_state['messages'])}")
 
     # a resposta do assistente é o ULTIMO item do historico
-    hist = at.session_state["messages"]
-    if hist:
-        ultimo = hist[-1]
-        print(f"  ultimo papel  : {ultimo['role']}")
-        print(f"  ultimo conteudo: {str(ultimo['content'])[:600]}")
-        ok = ultimo["role"] == "assistant" and ultimo["content"]
+    history = at.session_state["messages"]
+    if history:
+        last = history[-1]
+        print(f"  ultimo papel  : {last['role']}")
+        print(f"  ultimo conteudo: {str(last['content'])[:600]}")
+        ok = last["role"] == "assistant" and last["content"]
     else:
         ok = False
 
@@ -109,7 +109,7 @@ def diagnosticar(at, rotulo):
 
 
 def main():
-    resultados = {}
+    results = {}
 
     # ---------------- Cenário 1: texto puro ----------------
     try:
@@ -122,11 +122,11 @@ def main():
 
         at.chat_input[0].set_value("Responda apenas: APTEST-TEXTO-OK")
         at.run(timeout=180)
-        resultados["texto"] = diagnosticar(at, "CENÁRIO 1 — apenas texto")
+        results["texto"] = report(at, "CENÁRIO 1 — apenas texto")
     except Exception:
         print("ERRO no cenario 1:")
         traceback.print_exc()
-        resultados["texto"] = False
+        results["texto"] = False
 
     # ---------------- Cenário 2: texto + PDF ----------------
     try:
@@ -134,18 +134,18 @@ def main():
         at.run()
         at.chat_input[0].set_value("Qual é o tema deste PDF? Responda em uma frase.")
         at.run(timeout=180)
-        resultados["pdf"] = diagnosticar(
+        results["pdf"] = report(
             at, f"CENÁRIO 2 — texto + PDF ({pdf_name})"
         )
     except Exception:
         print("ERRO no cenario 2:")
         traceback.print_exc()
-        resultados["pdf"] = False
+        results["pdf"] = False
 
     print(f"\n{'#' * 66}")
-    print(f"  RESUMO: texto={resultados.get('texto')} | pdf={resultados.get('pdf')}")
+    print(f"  RESUMO: texto={results.get('texto')} | pdf={results.get('pdf')}")
     print("#" * 66)
-    return 0 if all(resultados.values()) else 1
+    return 0 if all(results.values()) else 1
 
 
 if __name__ == "__main__":
